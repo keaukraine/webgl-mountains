@@ -73,6 +73,12 @@ export class TerrainWaterShader extends TerrainShader {
                 float water = lmTexture.b;
                 gl_FragColor = mix(diffuse, waterColor, water);
                 gl_FragColor = mix(gl_FragColor, uFogColor, vFogAmount);
+                // gl_FragColor *= 0.001; gl_FragColor += texture2D(sTexture, vTextureCoord); // diffuse only
+                // gl_FragColor *= 0.001; gl_FragColor += lmAmount; // greyscale lightmap
+                // gl_FragColor *= 0.001; gl_FragColor += lm; // colored lightmap
+                // gl_FragColor *= 0.001; gl_FragColor += diffuse; // diffuse w/ colored lightmap
+                // gl_FragColor *= 0.001; gl_FragColor += waterColor; // specular w/o map
+                // gl_FragColor *= 0.001; gl_FragColor += waterColor * water; // specular w/ map
             }`;
     }
 

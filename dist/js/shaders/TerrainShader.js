@@ -25,7 +25,7 @@ class TerrainShader extends webgl_framework_1.DiffuseShader {
                 vTextureCoord = rm_TexCoord0;
                 vFogAmount = clamp((length(gl_Position) - fogStartDistance) / fogDistance, ZERO, ONE);
             }`;
-        this.fragmentShaderCode = `precision highp float;
+        this.fragmentShaderCode = `precision mediump float;
             varying vec2 vTextureCoord;
             uniform sampler2D sTexture;
             uniform sampler2D sLM;

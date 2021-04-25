@@ -34,7 +34,7 @@ export class TerrainShader extends DiffuseShader {
                 vFogAmount = clamp((length(gl_Position) - fogStartDistance) / fogDistance, ZERO, ONE);
             }`;
 
-        this.fragmentShaderCode = `precision highp float;
+        this.fragmentShaderCode = `precision mediump float;
             varying vec2 vTextureCoord;
             uniform sampler2D sTexture;
             uniform sampler2D sLM;
