@@ -2,6 +2,8 @@
 
 Live demo page is available here: https://keaukraine.github.io/webgl-mountains/index.html
 
+Article on how scene is created and composed: https://keaukraine.medium.com/creating-mountains-landscape-in-opengl-es-a56386950506
+
 Works in latest Chrome, Firefox, Safari and Edge.
 
 # Used Libraries
