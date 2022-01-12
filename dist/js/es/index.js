@@ -1,3 +1,5 @@
+
+(function(l, r) { if (l.getElementById('livereloadscript')) return; r = l.createElement('script'); r.async = 1; r.src = '//' + (window.location.host || 'localhost').split(':')[0] + ':35729/livereload.js?snipver=1'; r.id = 'livereloadscript'; l.getElementsByTagName('head')[0].appendChild(r) })(window.document);
 class FullScreenUtils {
     /** Enters fullscreen. */
     enterFullScreen() {
@@ -1583,6 +1585,7 @@ class DiffuseShader extends BaseShader {
         renderer.checkGlError("DiffuseShader glDrawElements");
     }
 }
+//# sourceMappingURL=webgl-framework.es6.js.map
 
 /**
  * Common utilities
@@ -2390,6 +2393,7 @@ class DiffuseColoredShader extends DiffuseShader {
         super.drawModel(renderer, model, tx, ty, tz, rx, ry, rz, sx, sy, sz);
     }
 }
+//# sourceMappingURL=DiffuseColoredShader.js.map
 
 class DiffuseAnimatedShader extends BaseShader {
     fillCode() {
@@ -2443,6 +2447,7 @@ class DiffuseAnimatedShader extends BaseShader {
         renderer.checkGlError("glDrawElements");
     }
 }
+//# sourceMappingURL=DiffuseAnimatedShader.js.map
 
 class DiffuseATColoredAnimatedShader extends DiffuseAnimatedShader {
     fillCode() {
@@ -2465,12 +2470,14 @@ class DiffuseATColoredAnimatedShader extends DiffuseAnimatedShader {
         this.color = this.getUniform("color");
     }
 }
+//# sourceMappingURL=DiffuseATColoredAnimatedShader.js.map
 
 var CameraMode;
 (function (CameraMode) {
     CameraMode[CameraMode["Rotating"] = 0] = "Rotating";
     CameraMode[CameraMode["Random"] = 1] = "Random";
 })(CameraMode || (CameraMode = {}));
+//# sourceMappingURL=CameraMode.js.map
 
 class TerrainShader extends DiffuseShader {
     static getInstance(gl, lightmapIndex) {
@@ -2525,6 +2532,7 @@ class TerrainShader extends DiffuseShader {
     }
 }
 TerrainShader.lightmapIndex = 0;
+//# sourceMappingURL=TerrainShader.js.map
 
 class TerrainWaterShader extends TerrainShader {
     static getInstance(gl, lightmapIndex) {
@@ -2607,6 +2615,7 @@ class TerrainWaterShader extends TerrainShader {
     }
 }
 TerrainWaterShader.lightmapIndexWater = 0;
+//# sourceMappingURL=TerrainWaterShader.js.map
 
 class CameraPositionInterpolator {
     constructor() {
@@ -2693,6 +2702,7 @@ class CameraPositionInterpolator {
         translate(this.matrix, this.matrix, [-this._cameraPosition[0], -this._cameraPosition[1], -this._cameraPosition[2]]);
     }
 }
+//# sourceMappingURL=CameraPositionInterpolator.js.map
 
 const FOV_LANDSCAPE = 60.0; // FOV for landscape
 const FOV_PORTRAIT = 70.0; // FOV for portrait
@@ -3166,8 +3176,8 @@ class MountainsRenderer extends BaseRenderer {
             UncompressedTextureLoader.load("data/textures/smoke.png", this.gl),
             UncompressedTextureLoader.load("data/textures/sun_flare.png", this.gl),
             UncompressedTextureLoader.load("data/textures/bird2.png", this.gl),
-            UncompressedTextureLoader.load("data/textures/diffuse.jpg", this.gl),
-            UncompressedTextureLoader.load("data/textures/" + this.preset.LM + ".jpg", this.gl, undefined, undefined, true)
+            UncompressedTextureLoader.load("data/textures/diffuse.webp", this.gl),
+            UncompressedTextureLoader.load("data/textures/" + this.preset.LM + ".webp", this.gl, undefined, undefined, true)
         ]);
         this.loaded = true;
         console.log("Loaded all assets");
@@ -3181,7 +3191,7 @@ class MountainsRenderer extends BaseRenderer {
         const textures = await Promise.all([
             UncompressedTextureLoader.load("data/textures/" + this.PRESETS[newPreset].SKY, this.gl, undefined, undefined, true),
             UncompressedTextureLoader.load("data/textures/" + this.PRESETS[newPreset].LM_GRADIENT + ".png", this.gl, undefined, undefined, true),
-            UncompressedTextureLoader.load("data/textures/" + this.PRESETS[newPreset].LM + ".jpg", this.gl, undefined, undefined, true),
+            UncompressedTextureLoader.load("data/textures/" + this.PRESETS[newPreset].LM + ".webp", this.gl, undefined, undefined, true),
         ]);
         this.gl.deleteTexture(this.skyTexture);
         this.gl.deleteTexture(this.textureTerrainGradient);
@@ -3476,6 +3486,9 @@ class MountainsRenderer extends BaseRenderer {
         this.cameraPositionInterpolator.position = this.CAMERAS[this.currentRandomCamera];
         this.cameraPositionInterpolator.reset();
     }
+    checkGlError(operation) {
+        // Do nothing in production build.
+    }
 }
 
 /**
@@ -3599,6 +3612,7 @@ class FpsCamera {
         }
     }
 }
+//# sourceMappingURL=FpsCamera.js.map
 
 var MovementMode;
 (function (MovementMode) {

@@ -529,8 +529,8 @@ export class MountainsRenderer extends BaseRenderer {
             UncompressedTextureLoader.load("data/textures/smoke.png", this.gl),
             UncompressedTextureLoader.load("data/textures/sun_flare.png", this.gl),
             UncompressedTextureLoader.load("data/textures/bird2.png", this.gl),
-            UncompressedTextureLoader.load("data/textures/diffuse.jpg", this.gl),
-            UncompressedTextureLoader.load("data/textures/" + this.preset.LM + ".jpg", this.gl, undefined, undefined, true)
+            UncompressedTextureLoader.load("data/textures/diffuse.webp", this.gl),
+            UncompressedTextureLoader.load("data/textures/" + this.preset.LM + ".webp", this.gl, undefined, undefined, true)
         ]);
 
         this.loaded = true;
@@ -548,7 +548,7 @@ export class MountainsRenderer extends BaseRenderer {
         const textures = await Promise.all([
             UncompressedTextureLoader.load("data/textures/" + this.PRESETS[newPreset].SKY, this.gl, undefined, undefined, true),
             UncompressedTextureLoader.load("data/textures/" + this.PRESETS[newPreset].LM_GRADIENT + ".png", this.gl, undefined, undefined, true),
-            UncompressedTextureLoader.load("data/textures/" + this.PRESETS[newPreset].LM + ".jpg", this.gl, undefined, undefined, true),
+            UncompressedTextureLoader.load("data/textures/" + this.PRESETS[newPreset].LM + ".webp", this.gl, undefined, undefined, true),
         ]);
 
         this.gl.deleteTexture(this.skyTexture!);
@@ -972,5 +972,9 @@ export class MountainsRenderer extends BaseRenderer {
         this.cameraPositionInterpolator.speed = this.CAMERA_SPEED * this.CAMERAS[this.currentRandomCamera].speedMultiplier;
         this.cameraPositionInterpolator.position = this.CAMERAS[this.currentRandomCamera];
         this.cameraPositionInterpolator.reset();
+    }
+
+    public checkGlError(operation: string): void {
+        // Do nothing in production build.
     }
 }
