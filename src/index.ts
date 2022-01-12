@@ -20,7 +20,7 @@ ready(() => {
         renderer,
         {
             canvas,
-            movementSpeed: 1200,
+            movementSpeed: 120,
             rotationSpeed: 0.006
         }
     );

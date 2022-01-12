@@ -2719,6 +2719,7 @@ class MountainsRenderer extends BaseRenderer {
         this.fmSun = new FullModel();
         this.fmBird = new FullModel();
         this.fmTerrain = new FullModel();
+        this.fmStone2 = new FullModel();
         this.Z_NEAR = 35.0;
         this.Z_FAR = 30000.0;
         this.timerDustRotation = 0;
@@ -3161,6 +3162,7 @@ class MountainsRenderer extends BaseRenderer {
             this.fmSun.load("data/models/sun_flare", this.gl),
             this.fmBird.load("data/models/bird-anim-uv", this.gl),
             this.fmTerrain.load("data/models/iceland", this.gl),
+            this.fmStone2.load("data/models/stone2", this.gl),
         ]);
         [
             this.skyTexture,
@@ -3169,7 +3171,8 @@ class MountainsRenderer extends BaseRenderer {
             this.textureSunFlare,
             this.textureBird,
             this.textureTerrainDiffuse,
-            this.textureTerrainLM
+            this.textureTerrainLM,
+            this.textureStone2
         ] = await Promise.all([
             UncompressedTextureLoader.load("data/textures/" + this.preset.SKY, this.gl, undefined, undefined, true),
             UncompressedTextureLoader.load("data/textures/" + this.preset.LM_GRADIENT + ".png", this.gl, undefined, undefined, true),
@@ -3177,7 +3180,8 @@ class MountainsRenderer extends BaseRenderer {
             UncompressedTextureLoader.load("data/textures/sun_flare.png", this.gl),
             UncompressedTextureLoader.load("data/textures/bird2.png", this.gl),
             UncompressedTextureLoader.load("data/textures/diffuse.webp", this.gl),
-            UncompressedTextureLoader.load("data/textures/" + this.preset.LM + ".webp", this.gl, undefined, undefined, true)
+            UncompressedTextureLoader.load("data/textures/" + this.preset.LM + ".webp", this.gl, undefined, undefined, true),
+            UncompressedTextureLoader.load("data/textures/stone2.png", this.gl),
         ]);
         this.loaded = true;
         console.log("Loaded all assets");
@@ -3185,6 +3189,14 @@ class MountainsRenderer extends BaseRenderer {
         (_b = document.getElementById("canvasGL")) === null || _b === void 0 ? void 0 : _b.classList.remove("transparent");
         setTimeout(() => { var _a; return (_a = document.querySelector(".promo")) === null || _a === void 0 ? void 0 : _a.classList.remove("transparent"); }, 1800);
         setTimeout(() => { var _a; return (_a = document.querySelector("#toggleFullscreen")) === null || _a === void 0 ? void 0 : _a.classList.remove("transparent"); }, 1800);
+        this.gl.bindTexture(this.gl.TEXTURE_2D, this.textureTerrainDiffuse);
+        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.LINEAR);
+        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.LINEAR_MIPMAP_LINEAR);
+        this.gl.generateMipmap(this.gl.TEXTURE_2D);
+        this.gl.bindTexture(this.gl.TEXTURE_2D, this.textureTerrainLM);
+        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.LINEAR);
+        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.LINEAR_MIPMAP_LINEAR);
+        this.gl.generateMipmap(this.gl.TEXTURE_2D);
     }
     async changeTimeOfDay() {
         const newPreset = ++this.currentPreset % this.PRESETS.length;
@@ -3356,6 +3368,8 @@ class MountainsRenderer extends BaseRenderer {
         this.shaderDiffuse.use();
         this.setTexture2D(0, this.skyTexture, this.shaderDiffuse.sTexture);
         this.shaderDiffuse.drawModel(this, this.fmSky, 0, 0, -1200, 0, 0, 0, 150, 150, 150);
+        this.setTexture2D(0, this.textureStone2, this.shaderDiffuse.sTexture);
+        this.shaderDiffuse.drawModel(this, this.fmStone2, 0, 0, -360, 0, 0, 0, 50, 50, 50);
         this.drawClouds();
         this.drawSun();
     }
@@ -3485,9 +3499,6 @@ class MountainsRenderer extends BaseRenderer {
         this.cameraPositionInterpolator.speed = this.CAMERA_SPEED * this.CAMERAS[this.currentRandomCamera].speedMultiplier;
         this.cameraPositionInterpolator.position = this.CAMERAS[this.currentRandomCamera];
         this.cameraPositionInterpolator.reset();
-    }
-    checkGlError(operation) {
-        // Do nothing in production build.
     }
 }
 
@@ -3679,7 +3690,7 @@ ready(() => {
     const canvas = document.getElementById("canvasGL");
     new FreeMovement(renderer, {
         canvas,
-        movementSpeed: 1200,
+        movementSpeed: 120,
         rotationSpeed: 0.006
     });
     const fullScreenUtils = new FullScreenUtils();

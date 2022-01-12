@@ -24,6 +24,7 @@ export class MountainsRenderer extends BaseRenderer {
     private fmSun = new FullModel();
     private fmBird = new FullModel();
     private fmTerrain = new FullModel();
+    private fmStone2 = new FullModel();
 
     private skyTexture: WebGLTexture | undefined;
     private textureCloud: WebGLTexture | undefined;
@@ -32,6 +33,7 @@ export class MountainsRenderer extends BaseRenderer {
     private textureTerrainDiffuse: WebGLTexture | undefined;
     private textureTerrainLM: WebGLTexture | undefined;
     private textureTerrainGradient: WebGLTexture | undefined;
+    private textureStone2: WebGLTexture | undefined;
 
     private shaderDiffuse: DiffuseShader | undefined;
     private shaderDiffuseColored: DiffuseColoredShader | undefined;
@@ -513,6 +515,7 @@ export class MountainsRenderer extends BaseRenderer {
             this.fmSun.load("data/models/sun_flare", this.gl),
             this.fmBird.load("data/models/bird-anim-uv", this.gl),
             this.fmTerrain.load("data/models/iceland", this.gl),
+            this.fmStone2.load("data/models/stone2", this.gl),
         ]);
 
         [
@@ -522,7 +525,8 @@ export class MountainsRenderer extends BaseRenderer {
             this.textureSunFlare,
             this.textureBird,
             this.textureTerrainDiffuse,
-            this.textureTerrainLM
+            this.textureTerrainLM,
+            this.textureStone2
         ] = await Promise.all([
             UncompressedTextureLoader.load("data/textures/" + this.preset.SKY, this.gl, undefined, undefined, true),
             UncompressedTextureLoader.load("data/textures/" + this.preset.LM_GRADIENT + ".png", this.gl, undefined, undefined, true),
@@ -530,7 +534,8 @@ export class MountainsRenderer extends BaseRenderer {
             UncompressedTextureLoader.load("data/textures/sun_flare.png", this.gl),
             UncompressedTextureLoader.load("data/textures/bird2.png", this.gl),
             UncompressedTextureLoader.load("data/textures/diffuse.webp", this.gl),
-            UncompressedTextureLoader.load("data/textures/" + this.preset.LM + ".webp", this.gl, undefined, undefined, true)
+            UncompressedTextureLoader.load("data/textures/" + this.preset.LM + ".webp", this.gl, undefined, undefined, true),
+            UncompressedTextureLoader.load("data/textures/stone2.png", this.gl),
         ]);
 
         this.loaded = true;
@@ -540,6 +545,15 @@ export class MountainsRenderer extends BaseRenderer {
         document.getElementById("canvasGL")?.classList.remove("transparent");
         setTimeout(() => document.querySelector(".promo")?.classList.remove("transparent"), 1800);
         setTimeout(() => document.querySelector("#toggleFullscreen")?.classList.remove("transparent"), 1800);
+
+        this.gl.bindTexture(this.gl.TEXTURE_2D, this.textureTerrainDiffuse);
+        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.LINEAR);
+        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.LINEAR_MIPMAP_LINEAR);
+        this.gl.generateMipmap(this.gl.TEXTURE_2D);
+        this.gl.bindTexture(this.gl.TEXTURE_2D, this.textureTerrainLM);
+        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.LINEAR);
+        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.LINEAR_MIPMAP_LINEAR);
+        this.gl.generateMipmap(this.gl.TEXTURE_2D);
     }
 
     async changeTimeOfDay(): Promise<void> {
@@ -749,6 +763,15 @@ export class MountainsRenderer extends BaseRenderer {
         this.shaderDiffuse.use();
         this.setTexture2D(0, this.skyTexture!, this.shaderDiffuse.sTexture!);
         this.shaderDiffuse.drawModel(this, this.fmSky, 0, 0, -1200, 0, 0, 0, 150, 150, 150);
+
+        this.setTexture2D(0, this.textureStone2!, this.shaderDiffuse.sTexture!);
+        this.shaderDiffuse.drawModel(
+            this,
+            this.fmStone2,
+            0, 0, -360,
+            0, 0, 0,
+            50, 50, 50
+        );
 
         this.drawClouds();
 
@@ -974,7 +997,7 @@ export class MountainsRenderer extends BaseRenderer {
         this.cameraPositionInterpolator.reset();
     }
 
-    public checkGlError(operation: string): void {
-        // Do nothing in production build.
-    }
+    // public checkGlError(operation: string): void {
+    //     // Do nothing in production build.
+    // }
 }

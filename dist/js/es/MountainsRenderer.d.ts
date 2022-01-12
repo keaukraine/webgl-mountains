@@ -9,6 +9,7 @@ export declare class MountainsRenderer extends BaseRenderer {
     private fmSun;
     private fmBird;
     private fmTerrain;
+    private fmStone2;
     private skyTexture;
     private textureCloud;
     private textureSunFlare;
@@ -16,6 +17,7 @@ export declare class MountainsRenderer extends BaseRenderer {
     private textureTerrainDiffuse;
     private textureTerrainLM;
     private textureTerrainGradient;
+    private textureStone2;
     private shaderDiffuse;
     private shaderDiffuseColored;
     private shaderAnimated;
@@ -95,5 +97,4 @@ export declare class MountainsRenderer extends BaseRenderer {
     private smoothstep;
     private smootherstep;
     private randomizeCamera;
-    checkGlError(operation: string): void;
 }
