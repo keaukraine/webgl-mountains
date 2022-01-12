@@ -481,9 +481,17 @@ class MountainsRenderer extends webgl_framework_1.BaseRenderer {
             webgl_framework_1.UncompressedTextureLoader.load("data/textures/smoke.png", this.gl),
             webgl_framework_1.UncompressedTextureLoader.load("data/textures/sun_flare.png", this.gl),
             webgl_framework_1.UncompressedTextureLoader.load("data/textures/bird2.png", this.gl),
-            webgl_framework_1.UncompressedTextureLoader.load("data/textures/diffuse.jpg", this.gl),
-            webgl_framework_1.UncompressedTextureLoader.load("data/textures/" + this.preset.LM + ".jpg", this.gl, undefined, undefined, true)
+            webgl_framework_1.UncompressedTextureLoader.load("data/textures/diffuse.webp", this.gl),
+            webgl_framework_1.UncompressedTextureLoader.load("data/textures/" + this.preset.LM + ".webp", this.gl, undefined, undefined, true)
         ]);
+        this.gl.bindTexture(this.gl.TEXTURE_2D, this.textureTerrainDiffuse);
+        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.LINEAR);
+        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.LINEAR_MIPMAP_LINEAR);
+        this.gl.generateMipmap(this.gl.TEXTURE_2D);
+        this.gl.bindTexture(this.gl.TEXTURE_2D, this.textureTerrainLM);
+        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.LINEAR);
+        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.LINEAR_MIPMAP_LINEAR);
+        this.gl.generateMipmap(this.gl.TEXTURE_2D);
         this.loaded = true;
         console.log("Loaded all assets");
         (_a = document.getElementById("message")) === null || _a === void 0 ? void 0 : _a.classList.add("hidden");
@@ -496,7 +504,7 @@ class MountainsRenderer extends webgl_framework_1.BaseRenderer {
         const textures = await Promise.all([
             webgl_framework_1.UncompressedTextureLoader.load("data/textures/" + this.PRESETS[newPreset].SKY, this.gl, undefined, undefined, true),
             webgl_framework_1.UncompressedTextureLoader.load("data/textures/" + this.PRESETS[newPreset].LM_GRADIENT + ".png", this.gl, undefined, undefined, true),
-            webgl_framework_1.UncompressedTextureLoader.load("data/textures/" + this.PRESETS[newPreset].LM + ".jpg", this.gl, undefined, undefined, true),
+            webgl_framework_1.UncompressedTextureLoader.load("data/textures/" + this.PRESETS[newPreset].LM + ".webp", this.gl, undefined, undefined, true),
         ]);
         this.gl.deleteTexture(this.skyTexture);
         this.gl.deleteTexture(this.textureTerrainGradient);
@@ -790,6 +798,9 @@ class MountainsRenderer extends webgl_framework_1.BaseRenderer {
         this.cameraPositionInterpolator.speed = this.CAMERA_SPEED * this.CAMERAS[this.currentRandomCamera].speedMultiplier;
         this.cameraPositionInterpolator.position = this.CAMERAS[this.currentRandomCamera];
         this.cameraPositionInterpolator.reset();
+    }
+    checkGlError(operation) {
+        // Do nothing in production build.
     }
 }
 exports.MountainsRenderer = MountainsRenderer;

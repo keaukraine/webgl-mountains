@@ -95,4 +95,5 @@ export declare class MountainsRenderer extends BaseRenderer {
     private smoothstep;
     private smootherstep;
     private randomizeCamera;
+    checkGlError(operation: string): void;
 }
