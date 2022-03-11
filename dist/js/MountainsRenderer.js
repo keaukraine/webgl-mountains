@@ -460,22 +460,14 @@ class MountainsRenderer extends webgl_framework_1.BaseRenderer {
     }
     async loadData() {
         var _a, _b;
-        await Promise.all([
+        const modelsPromise = Promise.all([
             this.fmSky.load("data/models/sky", this.gl),
             this.fmSmoke.load("data/models/cloud", this.gl),
             this.fmSun.load("data/models/sun_flare", this.gl),
             this.fmBird.load("data/models/bird-anim-uv", this.gl),
             this.fmTerrain.load("data/models/iceland", this.gl),
         ]);
-        [
-            this.skyTexture,
-            this.textureTerrainGradient,
-            this.textureCloud,
-            this.textureSunFlare,
-            this.textureBird,
-            this.textureTerrainDiffuse,
-            this.textureTerrainLM
-        ] = await Promise.all([
+        const texturesPromise = Promise.all([
             webgl_framework_1.UncompressedTextureLoader.load("data/textures/" + this.preset.SKY, this.gl, undefined, undefined, true),
             webgl_framework_1.UncompressedTextureLoader.load("data/textures/" + this.preset.LM_GRADIENT + ".png", this.gl, undefined, undefined, true),
             webgl_framework_1.UncompressedTextureLoader.load("data/textures/smoke.png", this.gl),
@@ -484,6 +476,16 @@ class MountainsRenderer extends webgl_framework_1.BaseRenderer {
             webgl_framework_1.UncompressedTextureLoader.load("data/textures/diffuse.webp", this.gl),
             webgl_framework_1.UncompressedTextureLoader.load("data/textures/" + this.preset.LM + ".webp", this.gl, undefined, undefined, true)
         ]);
+        const [models, textures] = await Promise.all([modelsPromise, texturesPromise]);
+        [
+            this.skyTexture,
+            this.textureTerrainGradient,
+            this.textureCloud,
+            this.textureSunFlare,
+            this.textureBird,
+            this.textureTerrainDiffuse,
+            this.textureTerrainLM
+        ] = textures;
         this.gl.bindTexture(this.gl.TEXTURE_2D, this.textureTerrainDiffuse);
         this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.LINEAR);
         this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.LINEAR_MIPMAP_LINEAR);

@@ -123,8 +123,10 @@ class FullModel {
      * @returns Promise which resolves when model is loaded.
      */
     async load(url, gl) {
-        const dataIndices = await BinaryDataLoader.load(url + "-indices.bin");
-        const dataStrides = await BinaryDataLoader.load(url + "-strides.bin");
+        const [dataIndices, dataStrides] = await Promise.all([
+            BinaryDataLoader.load(`${url}-indices.bin`),
+            BinaryDataLoader.load(`${url}-strides.bin`)
+        ]);
         console.log(`Loaded ${url}-indices.bin (${dataIndices.byteLength} bytes)`);
         console.log(`Loaded ${url}-strides.bin (${dataStrides.byteLength} bytes)`);
         this.bufferIndices = gl.createBuffer();
@@ -3145,22 +3147,14 @@ class MountainsRenderer extends BaseRenderer {
     }
     async loadData() {
         var _a, _b;
-        await Promise.all([
+        const modelsPromise = Promise.all([
             this.fmSky.load("data/models/sky", this.gl),
             this.fmSmoke.load("data/models/cloud", this.gl),
             this.fmSun.load("data/models/sun_flare", this.gl),
             this.fmBird.load("data/models/bird-anim-uv", this.gl),
             this.fmTerrain.load("data/models/iceland", this.gl),
         ]);
-        [
-            this.skyTexture,
-            this.textureTerrainGradient,
-            this.textureCloud,
-            this.textureSunFlare,
-            this.textureBird,
-            this.textureTerrainDiffuse,
-            this.textureTerrainLM
-        ] = await Promise.all([
+        const texturesPromise = Promise.all([
             UncompressedTextureLoader.load("data/textures/" + this.preset.SKY, this.gl, undefined, undefined, true),
             UncompressedTextureLoader.load("data/textures/" + this.preset.LM_GRADIENT + ".png", this.gl, undefined, undefined, true),
             UncompressedTextureLoader.load("data/textures/smoke.png", this.gl),
@@ -3169,6 +3163,16 @@ class MountainsRenderer extends BaseRenderer {
             UncompressedTextureLoader.load("data/textures/diffuse.webp", this.gl),
             UncompressedTextureLoader.load("data/textures/" + this.preset.LM + ".webp", this.gl, undefined, undefined, true)
         ]);
+        const [models, textures] = await Promise.all([modelsPromise, texturesPromise]);
+        [
+            this.skyTexture,
+            this.textureTerrainGradient,
+            this.textureCloud,
+            this.textureSunFlare,
+            this.textureBird,
+            this.textureTerrainDiffuse,
+            this.textureTerrainLM
+        ] = textures;
         this.gl.bindTexture(this.gl.TEXTURE_2D, this.textureTerrainDiffuse);
         this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.LINEAR);
         this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.LINEAR_MIPMAP_LINEAR);
