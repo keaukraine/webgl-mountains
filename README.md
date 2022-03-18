@@ -1,6 +1,13 @@
+![image](https://user-images.githubusercontent.com/414072/158966636-28f38401-dde0-4828-aeff-44a631f64a03.png)
+
+
 # Iceland Mountains WebGL Demo
 
 Live demo page is available here: https://keaukraine.github.io/webgl-mountains/index.html
+
+Controls:
+* Mouse click changes time of day
+* By pressing Enter you can access free-camera mode. Movement is similar to UE4 - hold right mouse button for mouse look and use WASD to fly around.
 
 Article on how scene is created and composed: https://keaukraine.medium.com/creating-mountains-landscape-in-opengl-es-a56386950506
 
