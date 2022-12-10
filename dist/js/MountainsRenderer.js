@@ -9,6 +9,7 @@ const CameraMode_1 = require("./CameraMode");
 const TerrainShader_1 = require("./shaders/TerrainShader");
 const TerrainWaterShader_1 = require("./shaders/TerrainWaterShader");
 const CameraPositionInterpolator_1 = require("./CameraPositionInterpolator");
+const Utils_1 = require("./Utils");
 const FOV_LANDSCAPE = 60.0; // FOV for landscape
 const FOV_PORTRAIT = 70.0; // FOV for portrait
 const YAW_COEFF_NORMAL = 200.0; // camera rotation time
@@ -391,6 +392,7 @@ class MountainsRenderer extends webgl_framework_1.BaseRenderer {
         this.CAMERA_SPEED = 0.15;
         this.CAMERA_MIN_DURATION = 9000;
         this.cameraPositionInterpolator = new CameraPositionInterpolator_1.CameraPositionInterpolator();
+        this.isAvifSupported = false;
         this.cameraPositionInterpolator.speed = this.CAMERA_SPEED;
         this.cameraPositionInterpolator.minDuration = this.CAMERA_MIN_DURATION;
         this.randomizeCamera();
@@ -467,14 +469,16 @@ class MountainsRenderer extends webgl_framework_1.BaseRenderer {
             this.fmBird.load("data/models/bird-anim-uv", this.gl),
             this.fmTerrain.load("data/models/iceland", this.gl),
         ]);
+        this.isAvifSupported = await Utils_1.testAVIF();
+        const extension = this.isAvifSupported ? "avif" : "webp";
         const texturesPromise = Promise.all([
             webgl_framework_1.UncompressedTextureLoader.load("data/textures/" + this.preset.SKY, this.gl, undefined, undefined, true),
             webgl_framework_1.UncompressedTextureLoader.load("data/textures/" + this.preset.LM_GRADIENT + ".png", this.gl, undefined, undefined, true),
             webgl_framework_1.UncompressedTextureLoader.load("data/textures/smoke.png", this.gl),
             webgl_framework_1.UncompressedTextureLoader.load("data/textures/sun_flare.png", this.gl),
             webgl_framework_1.UncompressedTextureLoader.load("data/textures/bird2.png", this.gl),
-            webgl_framework_1.UncompressedTextureLoader.load("data/textures/diffuse.webp", this.gl),
-            webgl_framework_1.UncompressedTextureLoader.load("data/textures/" + this.preset.LM + ".webp", this.gl, undefined, undefined, true)
+            webgl_framework_1.UncompressedTextureLoader.load(`data/textures/diffuse.${extension}`, this.gl),
+            webgl_framework_1.UncompressedTextureLoader.load("data/textures/" + this.preset.LM + `.${extension}`, this.gl, undefined, undefined, true)
         ]);
         const [models, textures] = await Promise.all([modelsPromise, texturesPromise]);
         [
@@ -503,10 +507,11 @@ class MountainsRenderer extends webgl_framework_1.BaseRenderer {
     }
     async changeTimeOfDay() {
         const newPreset = ++this.currentPreset % this.PRESETS.length;
+        const extension = this.isAvifSupported ? "avif" : "webp";
         const textures = await Promise.all([
             webgl_framework_1.UncompressedTextureLoader.load("data/textures/" + this.PRESETS[newPreset].SKY, this.gl, undefined, undefined, true),
             webgl_framework_1.UncompressedTextureLoader.load("data/textures/" + this.PRESETS[newPreset].LM_GRADIENT + ".png", this.gl, undefined, undefined, true),
-            webgl_framework_1.UncompressedTextureLoader.load("data/textures/" + this.PRESETS[newPreset].LM + ".webp", this.gl, undefined, undefined, true),
+            webgl_framework_1.UncompressedTextureLoader.load("data/textures/" + this.PRESETS[newPreset].LM + `.${extension}`, this.gl, undefined, undefined, true),
         ]);
         this.gl.deleteTexture(this.skyTexture);
         this.gl.deleteTexture(this.textureTerrainGradient);

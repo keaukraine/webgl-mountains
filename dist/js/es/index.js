@@ -2696,6 +2696,19 @@ class CameraPositionInterpolator {
     }
 }
 
+/**
+ * Tests for AVIF images support in browser.
+ */
+async function testAVIF() {
+    const promise = new Promise((resolve, reject) => {
+        const image = new Image();
+        image.onerror = () => reject(false); /* do something */
+        image.onload = () => resolve(true); /* do something */
+        image.src = "data:image/avif;base64,AAAAIGZ0eXBhdmlmAAAAAGF2aWZtaWYxbWlhZk1BMUIAAADybWV0YQAAAAAAAAAoaGRscgAAAAAAAAAAcGljdAAAAAAAAAAAAAAAAGxpYmF2aWYAAAAADnBpdG0AAAAAAAEAAAAeaWxvYwAAAABEAAABAAEAAAABAAABGgAAAB0AAAAoaWluZgAAAAAAAQAAABppbmZlAgAAAAABAABhdjAxQ29sb3IAAAAAamlwcnAAAABLaXBjbwAAABRpc3BlAAAAAAAAAAIAAAACAAAAEHBpeGkAAAAAAwgICAAAAAxhdjFDgQ0MAAAAABNjb2xybmNseAACAAIAAYAAAAAXaXBtYQAAAAAAAAABAAEEAQKDBAAAACVtZGF0EgAKCBgANogQEAwgMg8f8D///8WfhwB8+ErK42A=";
+    }).catch(() => false);
+    return await promise;
+}
+
 const FOV_LANDSCAPE = 60.0; // FOV for landscape
 const FOV_PORTRAIT = 70.0; // FOV for portrait
 const YAW_COEFF_NORMAL = 200.0; // camera rotation time
@@ -3078,6 +3091,7 @@ class MountainsRenderer extends BaseRenderer {
         this.CAMERA_SPEED = 0.15;
         this.CAMERA_MIN_DURATION = 9000;
         this.cameraPositionInterpolator = new CameraPositionInterpolator();
+        this.isAvifSupported = false;
         this.cameraPositionInterpolator.speed = this.CAMERA_SPEED;
         this.cameraPositionInterpolator.minDuration = this.CAMERA_MIN_DURATION;
         this.randomizeCamera();
@@ -3154,14 +3168,16 @@ class MountainsRenderer extends BaseRenderer {
             this.fmBird.load("data/models/bird-anim-uv", this.gl),
             this.fmTerrain.load("data/models/iceland", this.gl),
         ]);
+        this.isAvifSupported = await testAVIF();
+        const extension = this.isAvifSupported ? "avif" : "webp";
         const texturesPromise = Promise.all([
             UncompressedTextureLoader.load("data/textures/" + this.preset.SKY, this.gl, undefined, undefined, true),
             UncompressedTextureLoader.load("data/textures/" + this.preset.LM_GRADIENT + ".png", this.gl, undefined, undefined, true),
             UncompressedTextureLoader.load("data/textures/smoke.png", this.gl),
             UncompressedTextureLoader.load("data/textures/sun_flare.png", this.gl),
             UncompressedTextureLoader.load("data/textures/bird2.png", this.gl),
-            UncompressedTextureLoader.load("data/textures/diffuse.webp", this.gl),
-            UncompressedTextureLoader.load("data/textures/" + this.preset.LM + ".webp", this.gl, undefined, undefined, true)
+            UncompressedTextureLoader.load(`data/textures/diffuse.${extension}`, this.gl),
+            UncompressedTextureLoader.load("data/textures/" + this.preset.LM + `.${extension}`, this.gl, undefined, undefined, true)
         ]);
         const [models, textures] = await Promise.all([modelsPromise, texturesPromise]);
         [
@@ -3190,10 +3206,11 @@ class MountainsRenderer extends BaseRenderer {
     }
     async changeTimeOfDay() {
         const newPreset = ++this.currentPreset % this.PRESETS.length;
+        const extension = this.isAvifSupported ? "avif" : "webp";
         const textures = await Promise.all([
             UncompressedTextureLoader.load("data/textures/" + this.PRESETS[newPreset].SKY, this.gl, undefined, undefined, true),
             UncompressedTextureLoader.load("data/textures/" + this.PRESETS[newPreset].LM_GRADIENT + ".png", this.gl, undefined, undefined, true),
-            UncompressedTextureLoader.load("data/textures/" + this.PRESETS[newPreset].LM + ".webp", this.gl, undefined, undefined, true),
+            UncompressedTextureLoader.load("data/textures/" + this.PRESETS[newPreset].LM + `.${extension}`, this.gl, undefined, undefined, true),
         ]);
         this.gl.deleteTexture(this.skyTexture);
         this.gl.deleteTexture(this.textureTerrainGradient);

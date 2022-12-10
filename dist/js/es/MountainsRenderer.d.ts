@@ -60,6 +60,7 @@ export declare class MountainsRenderer extends BaseRenderer {
     private readonly CAMERA_SPEED;
     private readonly CAMERA_MIN_DURATION;
     private cameraPositionInterpolator;
+    private isAvifSupported;
     constructor();
     private logCamera;
     setCustomCamera(camera: mat4 | undefined, position?: vec3, rotation?: vec3): void;

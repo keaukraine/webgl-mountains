@@ -6,6 +6,7 @@ import { CameraMode } from "./CameraMode";
 import { TerrainShader } from "./shaders/TerrainShader";
 import { TerrainWaterShader } from "./shaders/TerrainWaterShader";
 import { CameraPositionInterpolator } from "./CameraPositionInterpolator";
+import { testAVIF } from "./Utils";
 
 
 const FOV_LANDSCAPE = 60.0; // FOV for landscape
@@ -427,6 +428,8 @@ export class MountainsRenderer extends BaseRenderer {
 
     private cameraPositionInterpolator = new CameraPositionInterpolator();
 
+    private isAvifSupported = false;
+
     constructor() {
         super();
         this.cameraPositionInterpolator.speed = this.CAMERA_SPEED;
@@ -514,14 +517,18 @@ export class MountainsRenderer extends BaseRenderer {
             this.fmBird.load("data/models/bird-anim-uv", this.gl),
             this.fmTerrain.load("data/models/iceland", this.gl),
         ]);
+
+        this.isAvifSupported = await testAVIF();
+        const extension = this.isAvifSupported ? "avif" : "webp";
+
         const texturesPromise = Promise.all([
             UncompressedTextureLoader.load("data/textures/" + this.preset.SKY, this.gl, undefined, undefined, true),
             UncompressedTextureLoader.load("data/textures/" + this.preset.LM_GRADIENT + ".png", this.gl, undefined, undefined, true),
             UncompressedTextureLoader.load("data/textures/smoke.png", this.gl),
             UncompressedTextureLoader.load("data/textures/sun_flare.png", this.gl),
             UncompressedTextureLoader.load("data/textures/bird2.png", this.gl),
-            UncompressedTextureLoader.load("data/textures/diffuse.webp", this.gl),
-            UncompressedTextureLoader.load("data/textures/" + this.preset.LM + ".webp", this.gl, undefined, undefined, true)
+            UncompressedTextureLoader.load(`data/textures/diffuse.${extension}`, this.gl),
+            UncompressedTextureLoader.load("data/textures/" + this.preset.LM + `.${extension}`, this.gl, undefined, undefined, true)
         ]);
 
         const [models, textures] = await Promise.all([modelsPromise, texturesPromise]);
@@ -542,7 +549,7 @@ export class MountainsRenderer extends BaseRenderer {
         this.gl.bindTexture(this.gl.TEXTURE_2D, this.textureTerrainLM);
         this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.LINEAR);
         this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.LINEAR_MIPMAP_LINEAR);
-        this.gl.generateMipmap(this.gl.TEXTURE_2D);        
+        this.gl.generateMipmap(this.gl.TEXTURE_2D);
 
         this.loaded = true;
         console.log("Loaded all assets");
@@ -556,10 +563,12 @@ export class MountainsRenderer extends BaseRenderer {
     async changeTimeOfDay(): Promise<void> {
         const newPreset = ++this.currentPreset % this.PRESETS.length;
 
+        const extension = this.isAvifSupported ? "avif" : "webp";
+
         const textures = await Promise.all([
             UncompressedTextureLoader.load("data/textures/" + this.PRESETS[newPreset].SKY, this.gl, undefined, undefined, true),
             UncompressedTextureLoader.load("data/textures/" + this.PRESETS[newPreset].LM_GRADIENT + ".png", this.gl, undefined, undefined, true),
-            UncompressedTextureLoader.load("data/textures/" + this.PRESETS[newPreset].LM + ".webp", this.gl, undefined, undefined, true),
+            UncompressedTextureLoader.load("data/textures/" + this.PRESETS[newPreset].LM + `.${extension}`, this.gl, undefined, undefined, true),
         ]);
 
         this.gl.deleteTexture(this.skyTexture!);
@@ -575,7 +584,7 @@ export class MountainsRenderer extends BaseRenderer {
         this.gl.bindTexture(this.gl.TEXTURE_2D, this.textureTerrainLM);
         this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.LINEAR);
         this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.LINEAR_MIPMAP_LINEAR);
-        this.gl.generateMipmap(this.gl.TEXTURE_2D);        
+        this.gl.generateMipmap(this.gl.TEXTURE_2D);
 
         this.preset = this.PRESETS[newPreset];
         this.currentPreset = newPreset;
