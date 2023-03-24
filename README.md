@@ -5,6 +5,8 @@
 
 Live demo page is available here: https://keaukraine.github.io/webgl-mountains/index.html
 
+Articel explaining rendering pipeline: https://keaukraine.medium.com/creating-mountains-landscape-in-opengl-es-a56386950506
+
 Controls:
 * Mouse click changes time of day
 * By pressing Enter you can access free-camera mode. Movement is similar to UE4 - hold right mouse button for mouse look and use WASD to fly around.
