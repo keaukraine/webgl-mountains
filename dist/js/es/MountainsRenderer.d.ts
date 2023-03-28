@@ -70,7 +70,7 @@ export declare class MountainsRenderer extends BaseRenderer {
     onInitError(): void;
     initShaders(): void;
     loadData(): Promise<void>;
-    changeTimeOfDay(): Promise<void>;
+    changeTimeOfDay(preset?: number): Promise<void>;
     animate(): void;
     /** Calculates projection matrix */
     setCameraFOV(multiplier: number): void;

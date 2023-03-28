@@ -10,6 +10,7 @@ const TerrainShader_1 = require("./shaders/TerrainShader");
 const TerrainWaterShader_1 = require("./shaders/TerrainWaterShader");
 const CameraPositionInterpolator_1 = require("./CameraPositionInterpolator");
 const Utils_1 = require("./Utils");
+const PlaceholderTextures_1 = require("./PlaceholderTextures");
 const FOV_LANDSCAPE = 60.0; // FOV for landscape
 const FOV_PORTRAIT = 70.0; // FOV for portrait
 const YAW_COEFF_NORMAL = 200.0; // camera rotation time
@@ -477,8 +478,8 @@ class MountainsRenderer extends webgl_framework_1.BaseRenderer {
             webgl_framework_1.UncompressedTextureLoader.load("data/textures/smoke.png", this.gl),
             webgl_framework_1.UncompressedTextureLoader.load("data/textures/sun_flare.png", this.gl),
             webgl_framework_1.UncompressedTextureLoader.load("data/textures/bird2.png", this.gl),
-            webgl_framework_1.UncompressedTextureLoader.load(`data/textures/diffuse.${extension}`, this.gl),
-            webgl_framework_1.UncompressedTextureLoader.load("data/textures/" + this.preset.LM + `.${extension}`, this.gl, undefined, undefined, true)
+            webgl_framework_1.UncompressedTextureLoader.load(PlaceholderTextures_1.TEX_DIFFUSE, this.gl),
+            webgl_framework_1.UncompressedTextureLoader.load(PlaceholderTextures_1.TEX_LM, this.gl, undefined, undefined, true)
         ]);
         const [models, textures] = await Promise.all([modelsPromise, texturesPromise]);
         [
@@ -504,9 +505,27 @@ class MountainsRenderer extends webgl_framework_1.BaseRenderer {
         (_b = document.getElementById("canvasGL")) === null || _b === void 0 ? void 0 : _b.classList.remove("transparent");
         setTimeout(() => { var _a; return (_a = document.querySelector(".promo")) === null || _a === void 0 ? void 0 : _a.classList.remove("transparent"); }, 1800);
         setTimeout(() => { var _a; return (_a = document.querySelector("#toggleFullscreen")) === null || _a === void 0 ? void 0 : _a.classList.remove("transparent"); }, 1800);
+        await Promise.all([
+            new Promise(async (resolve, reject) => {
+                try {
+                    const texDiffuse = await webgl_framework_1.UncompressedTextureLoader.load(`data/textures/diffuse.${extension}`, this.gl);
+                    this.gl.deleteTexture(this.textureTerrainDiffuse);
+                    this.textureTerrainDiffuse = texDiffuse;
+                    this.gl.bindTexture(this.gl.TEXTURE_2D, this.textureTerrainDiffuse);
+                    this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.LINEAR);
+                    this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.LINEAR_MIPMAP_LINEAR);
+                    this.gl.generateMipmap(this.gl.TEXTURE_2D);
+                    resolve();
+                }
+                catch (_a) {
+                    reject();
+                }
+            }),
+            this.changeTimeOfDay(this.currentPreset)
+        ]);
     }
-    async changeTimeOfDay() {
-        const newPreset = ++this.currentPreset % this.PRESETS.length;
+    async changeTimeOfDay(preset) {
+        const newPreset = preset !== null && preset !== void 0 ? preset : (++this.currentPreset % this.PRESETS.length);
         const extension = this.isAvifSupported ? "avif" : "webp";
         const textures = await Promise.all([
             webgl_framework_1.UncompressedTextureLoader.load("data/textures/" + this.PRESETS[newPreset].SKY, this.gl, undefined, undefined, true),

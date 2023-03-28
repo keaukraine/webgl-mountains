@@ -2709,6 +2709,9 @@ async function testAVIF() {
     return await promise;
 }
 
+const TEX_DIFFUSE = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAIAAABLbSncAAAACXBIWXMAAAsSAAALEgHS3X78AAAA00lEQVQImQHIADf/AZiPbQoLDgwNF+/t6w8SFhwfJgD//e3r5QHS0crm4dni39YLDhEiJDH5+fjSzMAGBwMEFRUVysCkzMW1FBYZHR0g+/jv5eDC/wEKAywiDtfSwhweFwL/B+nnzt7b0AEA9QUGDgHFwrMKCQrEv6gRA/YF/OLZ5fz3/vsjJjkCKCs2/wEG9/b64ebf5ufu7ezlGR0vOEFbAzYwH8vGvAkJBScvQ+/3CRsfKDxEXv/+/gTz8OIIBvHn4tcIB/0nKi75+PLy7+Pt7OfndWM0PgjnzgAAAABJRU5ErkJggg==";
+const TEX_LM = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAIAAAAmkwkpAAAACXBIWXMAAAsSAAALEgHS3X78AAAAP0lEQVQImQE0AMv/AVhSAekCABQJ//TUAQT/7AAFCQD28gf3E/sCDRsAHvYBAxQLFiwABO7nAPUH/wwI7/7vANdoEtUNSPyNAAAAAElFTkSuQmCC";
+
 const FOV_LANDSCAPE = 60.0; // FOV for landscape
 const FOV_PORTRAIT = 70.0; // FOV for portrait
 const YAW_COEFF_NORMAL = 200.0; // camera rotation time
@@ -3176,8 +3179,8 @@ class MountainsRenderer extends BaseRenderer {
             UncompressedTextureLoader.load("data/textures/smoke.png", this.gl),
             UncompressedTextureLoader.load("data/textures/sun_flare.png", this.gl),
             UncompressedTextureLoader.load("data/textures/bird2.png", this.gl),
-            UncompressedTextureLoader.load(`data/textures/diffuse.${extension}`, this.gl),
-            UncompressedTextureLoader.load("data/textures/" + this.preset.LM + `.${extension}`, this.gl, undefined, undefined, true)
+            UncompressedTextureLoader.load(TEX_DIFFUSE, this.gl),
+            UncompressedTextureLoader.load(TEX_LM, this.gl, undefined, undefined, true)
         ]);
         const [models, textures] = await Promise.all([modelsPromise, texturesPromise]);
         [
@@ -3203,9 +3206,27 @@ class MountainsRenderer extends BaseRenderer {
         (_b = document.getElementById("canvasGL")) === null || _b === void 0 ? void 0 : _b.classList.remove("transparent");
         setTimeout(() => { var _a; return (_a = document.querySelector(".promo")) === null || _a === void 0 ? void 0 : _a.classList.remove("transparent"); }, 1800);
         setTimeout(() => { var _a; return (_a = document.querySelector("#toggleFullscreen")) === null || _a === void 0 ? void 0 : _a.classList.remove("transparent"); }, 1800);
+        await Promise.all([
+            new Promise(async (resolve, reject) => {
+                try {
+                    const texDiffuse = await UncompressedTextureLoader.load(`data/textures/diffuse.${extension}`, this.gl);
+                    this.gl.deleteTexture(this.textureTerrainDiffuse);
+                    this.textureTerrainDiffuse = texDiffuse;
+                    this.gl.bindTexture(this.gl.TEXTURE_2D, this.textureTerrainDiffuse);
+                    this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.LINEAR);
+                    this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.LINEAR_MIPMAP_LINEAR);
+                    this.gl.generateMipmap(this.gl.TEXTURE_2D);
+                    resolve();
+                }
+                catch (_a) {
+                    reject();
+                }
+            }),
+            this.changeTimeOfDay(this.currentPreset)
+        ]);
     }
-    async changeTimeOfDay() {
-        const newPreset = ++this.currentPreset % this.PRESETS.length;
+    async changeTimeOfDay(preset) {
+        const newPreset = preset !== null && preset !== void 0 ? preset : (++this.currentPreset % this.PRESETS.length);
         const extension = this.isAvifSupported ? "avif" : "webp";
         const textures = await Promise.all([
             UncompressedTextureLoader.load("data/textures/" + this.PRESETS[newPreset].SKY, this.gl, undefined, undefined, true),
